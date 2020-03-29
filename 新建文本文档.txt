@@ -1,0 +1,85 @@
+package Test;
+
+
+import java.util.Scanner;
+
+public class Gongge {
+    public static int[][] group = new int[9][9];
+    public static int[][] value = new int[9][9];
+    public static int[][] row = new int[9][9];
+    public static int[][] ring = new int[9][9];
+    public static int[][] get_group = new int[9][9];
+
+    public void init() {
+        String[] S = new String[9];
+        for(int i = 0;i < 3;i++) {
+            S[i] = "000111222";
+            S[3 + i] = "333444555";
+            S[6 + i] = "666777888";
+        }
+        for(int i = 0;i < 9;i++) {
+            for(int j = 0;j < S[i].length();j++) {
+                group[i][j] = S[i].charAt(j) - '0';
+            }
+        }
+        for(int i = 0;i < 9;i++) {
+            for(int j = 0;j < 9;j++) {
+                row[i][j] = -1;
+                ring[i][j] = -1;
+                get_group[i][j] = -1;
+            }
+        }
+    }
+
+    public void dfs(int step) {
+        if(step == 81) {
+            for(int i = 0;i < 9;i++) {
+                for(int j = 0;j < 9;j++) {
+                    System.out.print(value[i][j]);
+                }
+                System.out.println();
+            }
+            return;
+        } else {
+            int x = step / 9;
+            int y = step % 9;
+            if(value[x][y] > 0) {
+                dfs(step + 1);
+            } else {
+                for(int i = 1;i <= 9;i++) {
+                    if(row[x][i - 1] == -1 && ring[y][i - 1] == -1 &&
+                            get_group[group[x][y]][i - 1] == -1 && value[x][y] == 0) {//这里可以判断行列宫中有无重复值
+                        value[x][y] = i;
+                        row[x][i - 1] = 1;
+                        ring[y][i - 1] = 1;
+                        get_group[group[x][y]][i - 1] = 1;
+                        dfs(step + 1);
+                        value[x][y] = 0;
+                        row[x][i - 1] = -1;
+                        ring[y][i - 1] = -1;
+                        get_group[group[x][y]][i - 1] = -1;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Gongge test = new Gongge();
+        test.init();
+        Scanner in = new Scanner(System.in);
+        for(int i = 0;i < 9;i++) {
+            String s = in.next();
+            for(int j = 0;j < s.length();j++) {
+                int t = s.charAt(j) - '0';
+                value[i][j] = t;
+                if(t != 0) {
+                    row[i][t - 1] = 1;
+                    ring[j][t - 1] = 1;
+                    get_group[group[i][j]][t - 1] = 1;
+                }
+            }
+        }
+        test.dfs(0);
+    }
+}
